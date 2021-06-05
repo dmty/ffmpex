@@ -4,7 +4,7 @@ defmodule FFmpex.Mixfile do
   def project do
     [
       app: :ffmpex,
-      version: "0.7.0",
+      version: "0.7.3",
       elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
@@ -33,7 +33,7 @@ defmodule FFmpex.Mixfile do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev},
-      {:jason, "~> 1.1.2"}
+      {:jason, "~> 1.2"}
     ]
   end
 

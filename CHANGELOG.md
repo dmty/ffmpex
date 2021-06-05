@@ -1,5 +1,17 @@
 # Changelog
 
+### 0.7.3 (2020-07-09)
+
+* Relaxed Jason dependency so it can get all 1.x versions without mix.exs update.
+
+### 0.7.2 (2020-07-09)
+
+* Bumped Jason dependency to 1.2.
+
+### 0.7.1 (2019-11-26)
+
+* Changed to `-loop` instead of deprecated `-loop_input` and `-loop_output` options in `FFmpex.Options.Advanced`.
+
 ## 0.7.0 (2019-09-05)
 
 * **Breaking change:** FFprobe API changes to return `{:ok, term}` or `{:error, atom}` from `format_names/1`, `format/1`, `streams/1`.
