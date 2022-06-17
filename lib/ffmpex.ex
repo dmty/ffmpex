@@ -11,7 +11,7 @@ defmodule FFmpex do
   But with FFmpex (this library), you add the file/stream first, then
   add the relevant options afterward.
 
-  Example usage:
+  ## Example
 
       import FFmpex
       use FFmpex.Options
@@ -65,16 +65,24 @@ defmodule FFmpex do
   end
 
   @doc """
+  Outputs to stdout, so it can be used directly from `execute/1`'s output
+
+  ##### this option cannot be used with output files
+  """
+  def to_stdout(%Command{files: files} = command) do
+    file = %File{type: :output, path: "-"}
+    %Command{command | files: [file | files]}
+  end
+
+  @doc """
   Add a stream specifier to the most recent file.
   The stream specifier is used as a target for per-stream options.
 
-  Example:
+  ## Example
 
-  ```
-  add_stream_specifier(command, stream_type: :video)
-  ```
+      add_stream_specifier(command, stream_type: :video)
 
-  Options:
+  ## Options
 
   * `:stream_index` - 0-based integer index for the stream
   * `:stream_type` - One of `:video`, `:video_without_pics`, `:audio`, `:subtitle`, `:data`, `:attachments`
@@ -101,6 +109,7 @@ defmodule FFmpex do
 
   @doc """
   Add a per-file option to the command.
+
   Applies to the most recently added file.
   """
   def add_file_option(%Command{files: [file | files]} = command, %Option{contexts: contexts} = option) do
@@ -113,6 +122,7 @@ defmodule FFmpex do
 
   @doc """
   Add a per-stream option to the command.
+
   Applies to the most recently added stream specifier, of the most recently added file.
   """
   def add_stream_option(%Command{files: [file | files]} = command, %Option{contexts: contexts} = option) do
@@ -128,16 +138,14 @@ defmodule FFmpex do
   @doc """
   Execute the command using ffmpeg CLI.
 
-  Returns `:ok` on success, or `{:error, {cmd_output, exit_status}}` on error.
+  Returns `{:ok, output}` on success, or `{:error, {cmd_output, exit_status}}` on error.
   """
-  @spec execute(command :: Command.t) :: :ok | {:error, {Collectable.t, exit_status :: non_neg_integer}}
+  @spec execute(command :: Command.t) :: {:ok, binary()} | {:error, {Collectable.t, exit_status :: non_neg_integer}}
   def execute(%Command{} = command) do
-    {executable, cmd_args} = prepare(command)
+    {executable, args} = prepare(command)
 
-    case System.cmd executable, cmd_args, stderr_to_stdout: true do
-      {_, 0} -> :ok
-      error -> {:error, error}
-    end
+    Rambo.run(executable, args, log: false)
+    |> format_output()
   end
 
   @doc """
@@ -184,6 +192,13 @@ defmodule FFmpex do
   defp validate_contexts!(contexts, required) when is_list(contexts) do
     unless Enum.member?(contexts, required), do: raise ArgumentError
   end
+
+  defp format_output({:ok, %{out: stdout}}), do:
+    {:ok, stdout}
+  defp format_output({:error, reason}) when is_binary(reason), do:
+    {:error, {reason, 1}}
+  defp format_output({:error, %{err: stderr, status: exit_status}}), do:
+    {:error, {stderr, exit_status}}
 
   # Read ffmpeg path from config. If unspecified, assume `ffmpeg` is in env $PATH.
   defp ffmpeg_path do

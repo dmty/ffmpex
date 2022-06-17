@@ -1,5 +1,32 @@
 # Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## 0.10.0 (2022-01-14)
+
+* Allow FFprobe on remote URLs, instead of treating URLs as nonexistent files.
+
+## 0.9.0 (2021-11-16)
+
+* Run commands with [Rambo](https://github.com/jayjun/rambo) instead of erlexec, to address issues running in Docker.
+* Requires Elixir 1.9.
+
+### 0.8.2 (2021-11-15)
+
+* Fixed starting erlexec when running as root.
+
+### 0.8.1 (2021-11-11)
+
+* Fixed `SHELL` environment variable check for erlexec.
+
+## 0.8.0 (2021-11-10)
+
+* **Breaking change:** `execute/1` returns `{:ok, output}` instead of `:ok`.
+* Added `to_stdout/1` to direct ffmpeg output to a buffer instead of a file. Retrieve buffer in `{:ok, output}` result of `execute/1`. ([#31](https://github.com/talklittle/ffmpex/pull/31))
+
 ### 0.7.3 (2020-07-09)
 
 * Relaxed Jason dependency so it can get all 1.x versions without mix.exs update.

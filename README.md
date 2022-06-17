@@ -1,10 +1,17 @@
 # FFmpex
 
-[![Build Status](https://travis-ci.org/talklittle/ffmpex.svg?branch=master)](https://travis-ci.org/talklittle/ffmpex)
+[![Build Status](https://github.com/talklittle/ffmpex/actions/workflows/ci.yml/badge.svg)](https://github.com/talklittle/ffmpex/actions?query=workflow%3ACI)
+[![Module Version](https://img.shields.io/hexpm/v/ffmpex.svg)](https://hex.pm/packages/ffmpex)
 
 An Elixir wrapper for the FFmpeg command line interface.
 
 Documentation: https://hexdocs.pm/ffmpex/
+
+## Usage notes
+
+The API is a builder, building up the list of options per-file, per-stream(-per-file), and globally.
+
+Note that adding options is backwards from using the ffmpeg CLI; when using ffmpeg CLI, you specify the options before each file. But with FFmpex (this library), you add the file/stream first, then add the relevant options afterward.
 
 ## Examples
 
@@ -22,7 +29,20 @@ command =
     |> add_file_option(option_maxrate("128k"))
     |> add_file_option(option_bufsize("64k"))
 
-:ok = execute(command)
+{:ok, output} = execute(command)
+```
+
+It is possible to obtain ffmpeg's output with:
+```elixir
+command =
+  FFmpex.new_command
+  |> add_input_file("/path/to/input.mp4")
+  |> to_stdout()
+  |> add_file_option(option_f("avi"))
+
+{:ok, output} = execute(command)
+
+do_something(output)
 ```
 
 You can use the `FFprobe` module to query for file info:
@@ -46,7 +66,9 @@ Add `ffmpex` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:ffmpex, "~> 0.7.2"}]
+  [
+    {:ffmpex, "~> 0.10.0"}
+  ]
 end
 ```
 
@@ -61,7 +83,7 @@ config :ffmpex, ffprobe_path: "/path/to/ffprobe"
 
 ## Release notes
 
-See the [changelog](CHANGELOG.md) for changes between versions.
+See the [Changelog](./CHANGELOG.md) for changes between versions.
 
 ## Disclaimer
 
@@ -69,6 +91,8 @@ FFmpex is not affiliated with nor endorsed by the FFmpeg project.
 
 FFmpeg is a trademark of [Fabrice Bellard](http://www.bellard.org/), originator of the FFmpeg project.
 
-## License
+## Copyright and License
 
-FFmpex source code is licensed under the [MIT License](LICENSE.md).
+Copyright (c) 2016 Andrew Shu
+
+FFmpex source code is licensed under the [MIT License](./LICENSE.md).
